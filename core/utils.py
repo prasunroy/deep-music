@@ -13,12 +13,16 @@ import subprocess
 
 
 # extract audio from a video
-def extract_audio(src, dst, bitrate=192, overwrite=False, verbose=False):
+def extract_audio(src, dst, start=0, duration=-1, bitrate=192, overwrite=False,
+                  verbose=False):
     """Extracts audio from a video.
     
     Args:
         src      : Path to source video file.
         dst      : Path to target audio file.
+        start    : Start position in seconds. Defaults to 0.
+        duration : Duration of the extracted audio clip. For values <= 0 full
+                   audio clip is extracted. Defaults to -1.
         bitrate  : Bit rate of target audio in KHz. Possible values are 8, 16,
                    24, 32, 40, 48, 64, 80, 96, 112, 128, 160, 192, 224, 256,
                    or 320. Defaults to 192.
@@ -26,22 +30,58 @@ def extract_audio(src, dst, bitrate=192, overwrite=False, verbose=False):
         verbose  : Flag for verbose mode. Defaults to False.
     
     """
-    command = 'ffmpeg -i {} -b:a {}k -vn {} -v {} {}'.format(src, bitrate, '-y' if overwrite else '-n', 'info' if verbose else 'quiet', dst)
-    subprocess.call(command)
+    options = ['ffmpeg']
+    if start >= 0 and duration >= 1:
+        options.append('-ss {} -i {} -t {}'.format(start, src, duration))
+    else:
+        options.append('-i {}'.format(src))
+    options.append('-b:a {}k'.format(bitrate))
+    options.append('-vn')
+    if overwrite:
+        options.append('-y')
+    else:
+        options.append('-n')
+    if verbose:
+        options.append('-v info')
+    else:
+        options.append('-v quiet')
+    options.append(dst)
+    command = ' '.join(options)
+    subprocess.call(command, shell=True)
     return
 
 
 # remove audio from a video
-def extract_video(src, dst, overwrite=False, verbose=False):
+def extract_video(src, dst, start=0, duration=-1, overwrite=False,
+                  verbose=False):
     """Removes audio from a video.
     
     Args:
         src      : Path to source video file.
         dst      : Path to target video file.
+        start    : Start position in seconds. Defaults to 0.
+        duration : Duration of the extracted video clip. For values <= 0 full
+                   video clip is extracted. Defaults to -1.
         overwrite: Flag for overwriting target video file. Defaults to False.
         verbose  : Flag for verbose mode. Defaults to False.
     
     """
-    command = 'ffmpeg -i {} -c copy -an {} -v {} {}'.format(src, '-y' if overwrite else '-n', 'info' if verbose else 'quiet', dst)
-    subprocess.call(command)
+    options = ['ffmpeg']
+    if start >= 0 and duration >= 1:
+        options.append('-ss {} -i {} -t {}'.format(start, src, duration))
+    else:
+        options.append('-i {}'.format(src))
+    options.append('-c copy')
+    options.append('-an')
+    if overwrite:
+        options.append('-y')
+    else:
+        options.append('-n')
+    if verbose:
+        options.append('-v info')
+    else:
+        options.append('-v quiet')
+    options.append(dst)
+    command = ' '.join(options)
+    subprocess.call(command, shell=True)
     return
