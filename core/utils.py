@@ -85,3 +85,30 @@ def extract_video(src, dst, start=0, duration=-1, overwrite=False,
     command = ' '.join(options)
     subprocess.call(command, shell=True)
     return
+
+
+# download video from YouTube
+def download_video(ytid, out_dir=None, out_fmt=None, verbose=False):
+    """Downloads video from YouTube.
+    
+    Args:
+        ytid    : YouTube video identifier.
+        out_dir : Download directory. Uses current working directory if not
+                  specified. Defaults to None.
+        out_fmt : Target video format. Uses FFMPEG to convert downloaded video
+                  into specified format. Skips conversion if not specified.
+                  Defaults to None.
+        verbose : Flag for verbose mode. Defaults to False.
+    
+    """
+    options = ['youtube-dl']
+    if not out_dir is None:
+        options.append('-o {}/%(id)s.%(ext)s'.format(out_dir))
+    if not out_fmt is None:
+        options.append('--recode-video {}'.format(out_fmt))
+    if not verbose:
+        options.append('--quiet --no-warnings')
+    options.append(ytid)
+    command = ' '.join(options)
+    subprocess.call(command, shell=True)
+    return
