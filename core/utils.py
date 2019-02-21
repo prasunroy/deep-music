@@ -103,12 +103,15 @@ def download_video(ytid, out_dir=None, out_fmt=None, verbose=False):
     """
     options = ['youtube-dl']
     if not out_dir is None:
-        options.append('-o {}/%(id)s.%(ext)s'.format(out_dir))
+        options.append('-o "{}/%(id)s.%(ext)s"'.format(out_dir))
+    else:
+        options.append('-o "%(id)s.%(ext)s"')
     if not out_fmt is None:
         options.append('--recode-video {}'.format(out_fmt))
     if not verbose:
         options.append('--quiet --no-warnings')
-    options.append(ytid)
+    options.append('https://www.youtube.com/watch?v={}'.format(ytid))
+    
     command = ' '.join(options)
     subprocess.call(command, shell=True)
     return
