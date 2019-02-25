@@ -13,7 +13,6 @@ import glob
 import os
 import pandas
 import re
-
 from core.utils import download_video
 from core.utils import recode_media
 
@@ -75,7 +74,6 @@ def download_audioset():
         print('[ERROR] Expected a positive integer')
         return
     n_vids = min(int(n_vids), len(videos))
-    videos = videos[:n_vids]
     print('[DEBUG] Selected {} videos'.format(n_vids), end='')
     outdir = input('[INPUT] Output directory: ')
     if outdir == '':
@@ -86,20 +84,24 @@ def download_audioset():
     for directory in [path_r, path_v, path_a]:
         if not os.path.isdir(directory):
             os.makedirs(directory)
-    for index, (ytid, start, length) in enumerate(videos):
-        print('\r[DEBUG] Downloading and converting videos... {} of {}'\
-              .format(index + 1, n_vids), end='')
-        download_video(ytid, path_r)
-        src_v = glob.glob(path_r + '/{}.*'.format(ytid))[0]
-        dst_v = path_v + '/{}.mp4'.format(ytid)
-        dst_a = path_a + '/{}.aac'.format(ytid)
-        recode_media(src_v, dst_v, start, length, overwrite=True)
-        recode_media(src_v, dst_a, start, length, overwrite=True)
+    n_done = 0
+    for ytid, start, length in videos:
+        print('\r[DEBUG] Downloading and converting videos... {} of {} '\
+              .format(n_done + 1, n_vids), end='')
         try:
+            download_video(ytid, path_r)
+            src_v = glob.glob(path_r + '/{}.*'.format(ytid))[0]
+            dst_v = path_v + '/{}.mp4'.format(ytid)
+            dst_a = path_a + '/{}.aac'.format(ytid)
+            recode_media(src_v, dst_v, start, length, overwrite=True)
+            recode_media(src_v, dst_a, start, length, overwrite=True)
             os.remove(src_v)
+            n_done += 1
         except:
             pass
-    print('\n[DEBUG] Finished')
+        if n_done >= n_vids:
+            print('\n[DEBUG] Finished')
+            break
     return
 
 
