@@ -68,13 +68,13 @@ def download_audioset():
     print('[DEBUG] Including videos with following tags: {}'.format(dnames))
     print('[DEBUG] Searching videos... ', end='')
     videos = find_videos(labels)
-    print('{} found'.format(len(videos)), end='')
+    print('{} found'.format(len(videos)))
     n_vids = input('[INPUT] Maximum number of videos to download: ')
     if not n_vids.isdigit():
         print('[ERROR] Expected a positive integer')
         return
     n_vids = min(int(n_vids), len(videos))
-    print('[DEBUG] Selected {} videos'.format(n_vids), end='')
+    print('[DEBUG] Selected {} videos'.format(n_vids))
     outdir = input('[INPUT] Output directory: ')
     if outdir == '':
         outdir = './audioset'
@@ -86,8 +86,8 @@ def download_audioset():
             os.makedirs(directory)
     n_done = 0
     for ytid, start, length in videos:
-        print('\r[DEBUG] Downloading and converting videos... {} of {} '\
-              .format(n_done + 1, n_vids), end='')
+        print('[DEBUG] Downloading and converting videos... {} of {}'\
+              .format(n_done + 1, n_vids))
         try:
             download_video(ytid, path_r)
             src_v = glob.glob(path_r + '/{}.*'.format(ytid))[0]
@@ -100,7 +100,7 @@ def download_audioset():
         except:
             pass
         if n_done >= n_vids:
-            print('\n[DEBUG] Finished')
+            print('[DEBUG] Finished')
             break
     return
 
